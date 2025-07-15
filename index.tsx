@@ -164,8 +164,8 @@ const jsonData :string[][] = XLSX.utils.sheet_to_json(programmeData.Sheets[progr
 slots.forEach(slot => {
     centers.forEach(center => {
         center.columns.forEach(column => {
-            if (jsonData[slot.row - 1][column - 1] !== undefined) {
-            const title = jsonData[slot.row - 1][column - 1]
+            if (jsonData[slot.row - 1][column - 2] !== undefined) {
+            const title = jsonData[slot.row - 1][column - 2]
             const activity: activity = {
                 slot: slot,
                 center: center,
@@ -183,7 +183,7 @@ slots.forEach(slot => {
 })
 
 for(const activity of activities) {
-    console.log(`Slot: ${activity.slot.slot}, Center: ${activity.center.name}, Title: ${activity.title}, U12: ${activity.u12}, ML: ${activity.ml}, S: ${activity.s}, LGBT: ${activity.lgbt}, Min Age: ${activity.minAge}`);
+    console.log(`Slot: ${activity.slot.date} - ${activity.slot.slot}, Center: ${activity.center.name}, Title: ${activity.title}, U12: ${activity.u12}, ML: ${activity.ml}, S: ${activity.s}, LGBT: ${activity.lgbt}, Min Age: ${activity.minAge}`);
 }
 
 //console.log(JSON.stringify(activities, null, 2));
