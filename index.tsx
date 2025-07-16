@@ -2,8 +2,8 @@ import { promises as fs } from "fs";
 import * as XLSX from "xlsx";
 import { renderToString } from "react-dom/server";
 import React from "react";
-import { format } from "date-fns/format"; //@ts-expect-error
-import { WPConf } from "./config.js";
+import { format } from "date-fns/format";
+import { google } from "googleapis";
 
 type Slot = {
   name: string;
@@ -244,7 +244,25 @@ type Activity = {
 
 const activities: Activity[] = [];
 
-async function readFileToArrayBuffer(filePath: string): Promise<ArrayBuffer> {
+async function getGoogleSheetData(sheetId: string, range: string): Promise<string[][]> {
+
+
+    const sheets = google.sheets({ version: "v4", auth: process.env.GOOGLE_SHEET_API_KEY });
+
+    const response = await sheets.spreadsheets.values.get({
+        spreadsheetId: sheetId,
+        range,
+    });
+
+    return response.data.values as string[][];
+}
+
+// Example usage:
+const sheetId = process.env.SHEET_ID!;
+const range = "Sheet1!A1:Z100";
+const jsonData: string[][] = await getGoogleSheetData(sheetId, range);
+
+/* async function readFileToArrayBuffer(filePath: string): Promise<ArrayBuffer> {
   const buffer = await fs.readFile(filePath);
   return buffer.buffer.slice(buffer.byteOffset, buffer.byteOffset + buffer.byteLength);
 }
@@ -252,13 +270,13 @@ async function readFileToArrayBuffer(filePath: string): Promise<ArrayBuffer> {
 const xslData = await readFileToArrayBuffer("Final Agenda for Core Centres_2025.07.15.xlsx");
 const programmeData = XLSX.read(xslData, { type: "array" });
 
-const jsonData: string[][] = XLSX.utils.sheet_to_json(programmeData.Sheets[programmeData.SheetNames[0]], { header: 1 });
+const jsonData: string[][] = XLSX.utils.sheet_to_json(programmeData.Sheets[programmeData.SheetNames[0]], { header: 1 }); */
 
 slotsOnDays.forEach((slot) => {
   centers.forEach((center) => {
     center.columns.forEach((column) => {
-      if (jsonData[slot.row - 1][column - 2] !== undefined) {
-        const title = jsonData[slot.row - 1][column - 2];
+      if (jsonData[slot.row - 1][column - 1] !== undefined) {
+        const title = jsonData[slot.row - 1][column - 1];
         const activity: Activity = {
           slotOnDay: slot,
           center: center,
@@ -281,77 +299,6 @@ for (const activity of activities) {
     `Slot: ${activity.slotOnDay.date} - ${activity.slotOnDay.slot.name}, Center: ${activity.center.name}, Title: ${activity.title}, U12: ${activity.u12}, ML: ${activity.ml}, S: ${activity.s}, LGBT: ${activity.lgbt}, Min Age: ${activity.minAge}`
   );
 }
-
-/* const maxActivitiesOnDay = (activities: activity[]) => {
-  const activitiesBySlot = activities.reduce<number[]>((acc, activity) => {
-    const slotIndex = slots.findIndex((slot) => activity.slotOnDay.slot === slot);
-    acc[slotIndex] = (acc[slotIndex] || 0) + 1;
-    return acc;
-  }, []);
-  const maxActivities = Math.max(...activitiesBySlot);
-  return maxActivities;
-}; */
-
-/* const maxActivitiesInSlotOnDay = (day: Date, center: Center) => {
-  const releventActivities = activities.filter((activity) => activity.slotOnDay.date === day && activity.center === center);
-  const activitiesBySlot = releventActivities.reduce<number[]>((acc, activity) => {
-    const slotIndex = slots.findIndex((slot) => activity.slotOnDay.slot === slot);
-    acc[slotIndex] = (acc[slotIndex] || 0) + 1;
-    return acc;
-  }, []);
-  const maxActivities = Math.max(...activitiesBySlot);
-  return maxActivities;
-}; */
-
-/* 
-const TableHeaderCell: React.FC<{ title: string; span: number }> = ({ span, title }) => <th colSpan={span}>{title}</th>;
-
-const TableHeaderCenters: React.FC<{ centers: center[]; activities: activity[]}> = ({ centers, activities}) => (
-  <thead>
-    <tr>
-      <th>Slot</th>
-      {centers.map((center) => (
-        <TableHeaderCell key={center.name} title={center.name} span={maxActivitiesOnDay(activities.filter((a) => a.center === center))} />
-      ))}
-    </tr>
-  </thead>
-);
-
-const TableCentersRow: React.FC<{ slot: slot; activities: activity[] }> = ({ slot, activities }) => {
-  const cells = [];
-  cells.push(<td key={`${slot.name}`}>{slot.name}</td>);
-
-  for (const center of centers) {
-    const activityForCenter = activities.filter((activity) => activity.center === center);
-    const maxActivities = maxActivitiesOnDay(activityForCenter);
-    const activitiesForSlot = activityForCenter.filter((activity) => activity.slotOnDay.slot === slot);
-
-    for (let i = 0; i < maxActivities; i++) {
-      if (i >= activitiesForSlot.length) {
-        cells.push(<td key={`${center.name}-${slot.name}-${i}`}></td>);
-      } else {
-        cells.push(<td key={`${center.name}-${slot.name}-${i}`}>{activitiesForSlot[i].title.split("(")[0]}</td>);
-      }
-    }
-  } 
-
-  return <tr>{cells}</tr>;
-};
-
-const TableForDay: React.FC<{ date: Date; slots: slot[]; activities: activity[]; centers: center[] }> = ({ date, slots, activities, centers }) => {
-  const activitiesOnDay = activities.filter((activity) => activity.slotOnDay.date === date);
-  return (
-    <table className="programme-table">
-      <caption>{date.toLocaleDateString()}</caption>
-      <TableHeaderCenters centers={centers} activities={activitiesOnDay}/>
-      <tbody>
-        {slots.map((slot) => (
-          <TableCentersRow key={`${slot.name}`} slot={slot} activities={activitiesOnDay} />
-        ))}
-      </tbody>
-    </table>
-  );
-}; */
 
 const ActivityCard: React.FC<{ activity: Activity; showCenter: boolean }> = ({ activity, showCenter }) => {
   return (
@@ -514,30 +461,30 @@ const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activiti
 };
 
 const wordpressPageUpsert = async (details: Record<string, any> & { slug: string }) => {
-  const pages = await fetch(`${WPConf.wordpressUrl}/pages?slug=${details.slug}&status=publish,future,draft,pending,private`, {
+  const pages = await fetch(`${process.env.WORDPRESS_URL}/pages?slug=${details.slug}&status=publish,future,draft,pending,private`, {
     headers: {
-      Authorization: `Basic ${Buffer.from(`${WPConf.wordpressUsername}:${WPConf.wordpressPassword}`).toString("base64")}`,
+      Authorization: `Basic ${Buffer.from(`${process.env.WORDPRESS_USERNAME}:${process.env.WORDPRESS_PASSWORD}`).toString("base64")}`,
     },
   });
 
   const responseJson = await pages.json();
 
   if (pages.ok && responseJson.length > 0) {
-    const response = await fetch(`${WPConf.wordpressUrl}/pages/${responseJson[0].id}`, {
+    const response = await fetch(`${process.env.WORDPRESS_URL}/pages/${responseJson[0].id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Basic ${Buffer.from(`${WPConf.wordpressUsername}:${WPConf.wordpressPassword}`).toString("base64")}`,
+        Authorization: `Basic ${Buffer.from(`${process.env.WORDPRESS_USERNAME}:${process.env.WORDPRESS_PASSWORD}`).toString("base64")}`,
       },
       body: JSON.stringify(details),
     });
     return response;
   } else {
-    const response = await fetch(`${WPConf.wordpressUrl}/pages`, {
+    const response = await fetch(`${process.env.WORDPRESS_URL}/pages`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Basic ${Buffer.from(`${WPConf.wordpressUsername}:${WPConf.wordpressPassword}`).toString("base64")}`,
+        Authorization: `Basic ${Buffer.from(`${process.env.WORDPRESS_USERNAME}:${process.env.WORDPRESS_PASSWORD}`).toString("base64")}`,
       },
       body: JSON.stringify(details),
     });

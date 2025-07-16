@@ -15,7 +15,8 @@
             "outFiles": [
                 "${workspaceFolder}/**/*.js"
             ],
-            "runtimeVersion": "22.15.1"
+            "runtimeVersion": "22.15.1",
+            "envFile": "${workspaceFolder}/.env"
         }
     ]
 }
