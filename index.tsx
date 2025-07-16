@@ -227,7 +227,7 @@ const centers: Center[] = [
     name: "Centres centre",
     slug: "centres-centre",
     columns: [20],
-  },
+  }
 ];
 
 type Activity = {
@@ -275,7 +275,7 @@ const jsonData: string[][] = XLSX.utils.sheet_to_json(programmeData.Sheets[progr
 slotsOnDays.forEach((slot) => {
   centers.forEach((center) => {
     center.columns.forEach((column) => {
-      if (jsonData[slot.row - 1][column - 1] !== undefined) {
+      if (jsonData[slot.row - 1][column - 1] !== undefined && jsonData[slot.row - 1][column - 1] !== "") {
         const title = jsonData[slot.row - 1][column - 1];
         const activity: Activity = {
           slotOnDay: slot,
@@ -347,9 +347,7 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
   const activitiesForCenter = activities.filter((activity) => activity.center === center);
   return (
     <>
-      <h2>{center.name}</h2>
       <div className="center-timetable-table">
-        <h3>Timetable</h3>
         <table className="programme-table programme-table-center">
           <thead>
             <tr>
@@ -410,9 +408,7 @@ const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activiti
   const activitiesForDate = activities.filter((activity) => activity.slotOnDay.date === date);
   return (
     <>
-      <h2>{format(date, "eeee do MMMM")}</h2>
       <div className="center-timetable-table">
-        <h3>Timetable</h3>
         <table className="programme-table programme-table-day">
           <thead>
             <tr>
@@ -492,14 +488,20 @@ const wordpressPageUpsert = async (details: Record<string, any> & { slug: string
   }
 };
 
-const parentPageReponse = await wordpressPageUpsert({
-  slug: "programme-activities",
-  title: "Programme",
-  content: "<p>This page contains the programme activities for the C100 event.</p>",
-  status: "publish",
-});
+const wordpressGetID = async (slug: string) => {
+  const pages = await fetch(`${process.env.WORDPRESS_URL}/pages?slug=${slug}&status=publish,future,draft,pending,private`, {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${process.env.WORDPRESS_USERNAME}:${process.env.WORDPRESS_PASSWORD}`).toString("base64")}`,
+    },
+    });
+    const responseJson = await pages.json();
+    if (pages.ok && responseJson.length > 0) {
+        return responseJson[0].id;
+        }
+    throw new Error(`Page with slug ${slug} not found`);
+}
 
-const parentPageId = (await parentPageReponse.json()).id;
+const parentPageId = await wordpressGetID("programme-activities")
 
 for (const center of centers) {
   const htmlString = renderToString(<PageForCenter activities={activities} center={center} />);
