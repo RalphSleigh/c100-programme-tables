@@ -2,7 +2,8 @@ import { promises as fs } from "fs";
 import * as XLSX from "xlsx";
 import { renderToString } from "react-dom/server";
 import React from "react";
-import { format } from "date-fns/format";
+import { format } from "date-fns/format"; //@ts-expect-error
+import { WPConf } from "./config.js";
 
 type Slot = {
   name: string;
@@ -13,17 +14,17 @@ type Slot = {
 const slot1: Slot = {
   name: "Slot 1",
   times: "11:00 - 12:30",
-  class: "slot-morning",
+  class: "slot-slot1",
 };
 const slot2: Slot = {
   name: "Slot 2",
   times: "15:00 - 16:30",
-  class: "slot-afternoon",
+  class: "slot-slot2",
 };
 const slot3: Slot = {
   name: "Slot 3",
   times: "16:30 - 17:45",
-  class: "slot-afternoon",
+  class: "slot-slot3",
 };
 const evening1: Slot = {
   name: "Evening",
@@ -33,7 +34,7 @@ const evening1: Slot = {
 const evening2: Slot = {
   name: "Late Evening",
   times: "22:30 - 23:30",
-  class: "slot-evening",
+  class: "slot-late-evening",
 };
 
 const slots: Slot[] = [slot1, slot2, slot3, evening1, evening2];
@@ -162,56 +163,69 @@ const slotsOnDays: SlotOnDay[] = [
 
 type Center = {
   name: string;
+  slug: string;
   columns: number[];
 };
 
 const centers: Center[] = [
   {
-    name: "Panet Utopia",
+    name: "Planet Utopia",
+    slug: "planet-utopia",
     columns: [3],
   },
   {
     name: "STEM Cell",
+    slug: "stem-cell",
     columns: [4],
   },
   {
     name: "MEST-UP",
+    slug: "mest-up",
     columns: [5],
   },
   {
     name: "Arts & Crafts",
+    slug: "arts-crafts",
     columns: [6, 7, 8],
   },
   {
     name: "Kids Rule the World",
+    slug: "kids-rule-the-world",
     columns: [9],
   },
   {
     name: "People's Printing Press",
+    slug: "peoples-printing-press",
     columns: [10, 11],
   },
   {
     name: "Ecology",
+    slug: "ecology",
     columns: [12, 13],
   },
   {
     name: "Peace & Conflict",
+    slug: "peace-conflict",
     columns: [14],
   },
   {
     name: "Puzzles",
+    slug: "puzzles",
     columns: [15, 16, 17],
   },
   {
     name: "Trade Union",
+    slug: "trade-union",
     columns: [18],
   },
   {
     name: "Trailblazers",
+    slug: "trailblazers",
     columns: [19],
   },
   {
     name: "Centres centre",
+    slug: "centres-centre",
     columns: [20],
   },
 ];
@@ -278,7 +292,7 @@ for (const activity of activities) {
   return maxActivities;
 }; */
 
-const maxActivitiesInSlotOnDay = (day: Date, center: Center) => {
+/* const maxActivitiesInSlotOnDay = (day: Date, center: Center) => {
   const releventActivities = activities.filter((activity) => activity.slotOnDay.date === day && activity.center === center);
   const activitiesBySlot = releventActivities.reduce<number[]>((acc, activity) => {
     const slotIndex = slots.findIndex((slot) => activity.slotOnDay.slot === slot);
@@ -287,7 +301,7 @@ const maxActivitiesInSlotOnDay = (day: Date, center: Center) => {
   }, []);
   const maxActivities = Math.max(...activitiesBySlot);
   return maxActivities;
-};
+}; */
 
 /* 
 const TableHeaderCell: React.FC<{ title: string; span: number }> = ({ span, title }) => <th colSpan={span}>{title}</th>;
@@ -339,30 +353,57 @@ const TableForDay: React.FC<{ date: Date; slots: slot[]; activities: activity[];
   );
 }; */
 
-const ActivityCard: React.FC<{ activity: Activity }> = ({ activity }) => {
+const ActivityCard: React.FC<{ activity: Activity; showCenter: boolean }> = ({ activity, showCenter }) => {
   return (
-    <div className={`activityCard activityCard-${activity.slotOnDay.slot.class}`}>
-      <strong>{activity.title.split("(")[0]}</strong>
+    <div className={`activityCard activityCard-${activity.slotOnDay.slot.class} activityCard-center-${activity.center.slug}`}>
+      <p className="activityCard-title">
+        {activity.title.split("(")[0]}
+        </p>
+        {showCenter ? <p className="activityCard-center-p">{activity.center.name}</p> : null}
       <div className="activity-badges">
-        {activity.u12 && <div className="badge u12"><span>U12</span></div>}
-        {activity.ml && <div className="badge ml"><span>ML</span></div>}
-        {activity.s && <div className="badge s"><span>S</span></div>}
-        {activity.lgbt && <div className="badge lgbt"><span>🏳️‍🌈</span></div>}
-        {activity.prebook && <div className="badge prebook"><span>Pre-book</span></div>}
-        {activity.minAge && <div className="badge min-age"><span>{activity.minAge}+</span></div>}
+        {activity.u12 && (
+          <div className="badge u12">
+            <span>U12</span>
+          </div>
+        )}
+        {activity.ml && (
+          <div className="badge ml">
+            <span>ML</span>
+          </div>
+        )}
+        {activity.s && (
+          <div className="badge s">
+            <span>S</span>
+          </div>
+        )}
+        {activity.lgbt && (
+          <div className="badge lgbt">
+            <span>🏳️‍🌈</span>
+          </div>
+        )}
+        {activity.prebook && (
+          <div className="badge prebook">
+            <span>Pre‑book</span>
+          </div>
+        )}
+        {activity.minAge && (
+          <div className="badge min-age">
+            <span>{activity.minAge}+</span>
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ activities, center }) => {
+const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ activities, center }) => {
   const activitiesForCenter = activities.filter((activity) => activity.center === center);
   return (
     <>
       <h2>{center.name}</h2>
       <div className="center-timetable-table">
         <h3>Timetable</h3>
-        <table className="programme-table">
+        <table className="programme-table programme-table-center">
           <thead>
             <tr>
               <th></th>
@@ -383,7 +424,7 @@ const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ 
                   return (
                     <td key={`${date.toISOString()}-${slot.name}`}>
                       {activitiesForSlot.map((activity, index) => (
-                        <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} />
+                        <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={false} />
                       ))}
                     </td>
                   );
@@ -396,7 +437,7 @@ const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ 
       {dates.map((date) => {
         const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
         return (
-          <div key={date.toISOString()} className="programme-date-section">
+          <div key={date.toISOString()} className="programme-date-section programme-table-center">
             <h3>{format(date, "eeee do MMMM")}</h3>
             {slots.map((slot) => {
               const activitiesForSlot = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
@@ -406,7 +447,7 @@ const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ 
                   <h4>{slot.name}</h4>
                   <p>{slot.times}</p>
                   {activitiesForSlot.map((activity, index) => {
-                    return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} />;
+                    return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={false} />;
                   })}
                 </div>
               );
@@ -418,8 +459,103 @@ const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ 
   );
 };
 
+const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activities, date }) => {
+  const activitiesForDate = activities.filter((activity) => activity.slotOnDay.date === date);
+  return (
+    <>
+      <h2>{format(date, "eeee do MMMM")}</h2>
+      <div className="center-timetable-table">
+        <h3>Timetable</h3>
+        <table className="programme-table programme-table-day">
+          <thead>
+            <tr>
+              <th></th>
+              {centers.map((center) => (
+                <th key={center.slug}>{center.name}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {slots.map((slot) => (
+              <tr key={slot.name}>
+                <td>
+                  <p>{slot.name}</p>
+                  <p className="times">{slot.times}</p>
+                </td>
+                {centers.map((center) => {
+                  const activitiesForCenter = activitiesForDate.filter((activity) => activity.center === center && activity.slotOnDay.slot === slot);
+                  return (
+                    <td key={`${date.toISOString()}-${center.slug}-${slot.name}`}>
+                      {activitiesForCenter.map((activity, index) => (
+                        <ActivityCard key={`${date.toISOString()}-${center.slug}-${slot.name}-${index}`} activity={activity} showCenter={true} />
+                      ))}
+                    </td>
+                  );
+                })}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {slots.map((slot) => {
+        const activitiesForSlot = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
+        return (
+          <div key={slot.name} className={`programme-slot-section programme-slot-${slot.class} programme-table-day`}>
+            <h4>{slot.name}</h4>
+            <p>{slot.times}</p>
+            {activitiesForSlot.map((activity, index) => {
+              return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={true} />;
+            })}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+const wordpressPageUpsert = async (details: Record<string, any> & { slug: string }) => {
+  const pages = await fetch(`${WPConf.wordpressUrl}/pages?slug=${details.slug}&status=publish,future,draft,pending,private`, {
+    headers: {
+      Authorization: `Basic ${Buffer.from(`${WPConf.wordpressUsername}:${WPConf.wordpressPassword}`).toString("base64")}`,
+    },
+  });
+
+  const responseJson = await pages.json();
+
+  if (pages.ok && responseJson.length > 0) {
+    const response = await fetch(`${WPConf.wordpressUrl}/pages/${responseJson[0].id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${Buffer.from(`${WPConf.wordpressUsername}:${WPConf.wordpressPassword}`).toString("base64")}`,
+      },
+      body: JSON.stringify(details),
+    });
+    return response;
+  } else {
+    const response = await fetch(`${WPConf.wordpressUrl}/pages`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Basic ${Buffer.from(`${WPConf.wordpressUsername}:${WPConf.wordpressPassword}`).toString("base64")}`,
+      },
+      body: JSON.stringify(details),
+    });
+    return response;
+  }
+};
+
+const parentPageReponse = await wordpressPageUpsert({
+  slug: "programme-activities",
+  title: "Programme",
+  content: "<p>This page contains the programme activities for the C100 event.</p>",
+  status: "publish",
+});
+
+const parentPageId = (await parentPageReponse.json()).id;
+
 for (const center of centers) {
-  const htmlString = renderToString(<TableForCenter activities={activities} center={center} />);
+  const htmlString = renderToString(<PageForCenter activities={activities} center={center} />);
 
   console.log(htmlString);
 
@@ -440,6 +576,44 @@ ${htmlString}
 </html>`;
 
   await fs.writeFile(`programme-${center.name}.html`, htmlFile, "utf8");
+  await wordpressPageUpsert({
+    slug: center.slug,
+    title: `Activities - ${center.name}`,
+    content: htmlString,
+    parent: parentPageId,
+    status: "publish",
+  });
+}
+
+for (const day of dates) {
+  const htmlString = renderToString(<PageForDay activities={activities} date={day} />);
+
+  console.log(htmlString);
+
+  const htmlFile = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Programme Activities</title>
+  <style>
+  ${await fs.readFile("fragment.css", "utf8")}
+  </style>
+</head>
+<body>
+${htmlString}
+</body>
+</html>`;
+
+  await fs.writeFile(`programme-${format(day, "MM-dd")}.html`, htmlFile, "utf8");
+  await wordpressPageUpsert({
+    slug: format(day, "MM-dd"),
+    title: `Activities - ${format(day, "eeee do MMMM")}`,
+    content: htmlString,
+    parent: parentPageId,
+    status: "publish",
+  });
 }
 
 //console.log(JSON.stringify(activities, null, 2));

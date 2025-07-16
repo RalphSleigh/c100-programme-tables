@@ -2,8 +2,12 @@ html {
   font-family: sans-serif;
 }
 
-table.programme-table {
+.center-timetable-table {
   width: 100%;
+  overflow-x: scroll;
+}
+
+table.programme-table {
   border-collapse: collapse;
 }
 
@@ -16,13 +20,16 @@ table.programme-table td {
 }
 
 table.programme-table th {
-    vertical-align: middle;
-    background-color: #f9f9f9;
+  vertical-align: middle;
+  background-color: #f9f9f9;
+  min-width: 10em;
 }
 
 table.programme-table td:first-child {
   font-weight: bold;
   background-color: #f9f9f9;
+  position: sticky;
+  left: 0px;
 }
 
 table.programme-table td div.activityBox {
@@ -44,6 +51,19 @@ table.programme-table td p.times {
   text-align: left;
 }
 
+.activityCard .activityCard-title {
+    margin-top: 0px;
+    margin-bottom: 0.5em;
+  font-weight: bold;
+}
+
+.activityCard .activityCard-center-p {
+  margin-top: 0em;
+  margin-bottom: 0.5em;
+  font-size: 0.9em;
+  color: #555;
+}
+
 .activityCard .activity-badges {
   display: flex;
   justify-content: flex-end;
@@ -59,16 +79,72 @@ table.programme-table td p.times {
   border-radius: 4px;
 }
 
-.activityCard-slot-morning {
-  border-left: 3px solid #36db59;
+.programme-table-center .activityCard-slot-slot1 {
+  border-left: 3px solid #efff13;
 }
 
-.activityCard-slot-afternoon {
-  border-left: 3px solid #ff1c4d;
+.programme-table-center .activityCard-slot-slot2 {
+  border-left: 3px solid #3cdb36;
 }
 
-.activityCard-slot-evening {
+.programme-table-center .activityCard-slot-slot3 {
+  border-left: 3px solid #36dbcd;
+}
+
+.programme-table-center .activityCard-slot-evening {
+  border-left: 3px solid #201cff;
+}
+
+.programme-table-center .activityCard-slot-late-evening {
   border-left: 3px solid #7c30bb;
+}
+
+.programme-table-day .activityCard-center-planet-utopia {
+  border-left: 3px solid #b700ff;
+}
+
+.programme-table-day .activityCard-center-stem-cell {
+  border-left: 3px solid #0d6d00;
+}
+
+.programme-table-day .activityCard-center-mest-up {
+  border-left: 3px solid #ff2be3;
+}
+
+.programme-table-day .activityCard-center-arts-crafts {
+  border-left: 3px solid #ace5ff;
+}
+
+.programme-table-day .activityCard-center-kids-rule-the-world {
+  border-left: 3px solid #ffff00;
+}
+
+.programme-table-day .activityCard-center-peoples-printing-press {
+  border-left: 3px solid #660000;
+}
+
+.programme-table-day .activityCard-center-ecology {
+  border-left: 3px solid #aeff9d;
+}
+
+.programme-table-day .activityCard-center-peace-conflict {
+  border-left: 3px solid #cacaca;
+}
+
+.programme-table-day .activityCard-center-puzzles {
+  border-left: 3px solid #020070;
+}
+
+.programme-table-day .activityCard-center-trade-union {
+  border-left: 3px solid #ff7070;
+}
+
+.programme-table-day .activityCard-center-trailblazers {
+  border-left: 3px solid #ff9100;
+}
+
+.programme-table-day .activityCard-center-centres-centre {
+  border-left: 3px solid #7a5000;
 }
 
 .activityCard .badge.u12 {
@@ -90,17 +166,13 @@ table.programme-table td p.times {
 .activityCard .badge.lgbt {
   font-size: 1em;
   padding: 0px;
-  background-color: #ccc;
+  background-color: #eeeeee;
 }
 
 .programme-date-section {
   margin-left: 3em;
   margin-bottom: 2em;
   margin-right: 1em;
-}
-
-.programme-date-section h3 {
-  margin-left: -2em;
 }
 
 .programme-slot-section h4 {
@@ -119,6 +191,12 @@ table.programme-table td p.times {
 
 @media (max-width: 40em) {
   .center-timetable-table {
+    display: none;
+  }
+}
+
+@media print {
+  .programme-date-section {
     display: none;
   }
 }
