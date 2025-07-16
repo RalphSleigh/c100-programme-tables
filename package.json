@@ -17,10 +17,14 @@
   },
   "homepage": "https://github.com/RalphSleigh/c100-programme-tables#readme",
   "devDependencies": {
+    "@types/react-dom": "^19.1.6",
     "typescript": "^5.8.3"
   },
   "dependencies": {
     "@types/node": "^24.0.14",
+    "date-fns": "^4.1.0",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
     "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "type": "module"

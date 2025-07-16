@@ -1,0 +1,75 @@
+html {
+      font-family: sans-serif;
+}
+
+table.programme-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table.programme-table th,
+table.programme-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: center;
+}
+
+table.programme-table td:first-child {
+  font-weight: bold;
+}
+
+table.programme-table td div.activityBox {
+    border: 1px solid #ddd;
+    padding: 4px;
+    margin: 2px;
+}
+
+table.programme-table td p.times {
+    font-size: 0.8em;
+    color: #666;
+}
+
+.activityCard {
+    border: 1px solid #ddd;
+    border-left: 3px solid #108129;
+    padding: 8px;
+    margin: 4px;
+    background-color: #f9f9f9;
+}
+
+.activityCard .activity-badges {
+    text-align: right;
+}
+
+.activityCard .badge {
+    background-color: #007bff;
+    color: white;
+    font-size: 0.8em;
+    padding: 2px 4px;
+    margin-left: 4px;
+    border-radius: 4px;
+}
+
+.activityCard .badge.u12 {
+    background-color: #28a745;
+}
+
+.activityCard .badge.ml {
+    background-color: #ffc107;
+}
+
+.activityCard .badge.s {
+    background-color: #17a2b8;
+}
+
+.activityCard .badge.lgbt {
+    font-size: 1.2em;
+    padding: 0px;
+    background-color: #ccc;
+}
+
+@media (max-width: 40em) {
+    .center-timetable-table {
+        display: none;
+    }
+}
