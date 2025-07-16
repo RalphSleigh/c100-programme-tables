@@ -7,27 +7,33 @@ import { format } from "date-fns/format";
 type Slot = {
   name: string;
   times: string;
+  class: string;
 };
 
 const slot1: Slot = {
-  name: "Morning",
+  name: "Slot 1",
   times: "11:00 - 12:30",
+  class: "slot-morning",
 };
 const slot2: Slot = {
-  name: "Afternoon",
-    times: "15:00 - 16:30",
+  name: "Slot 2",
+  times: "15:00 - 16:30",
+  class: "slot-afternoon",
 };
 const slot3: Slot = {
-  name: "Early Evening",
-    times: "16:30 - 17:45",
+  name: "Slot 3",
+  times: "16:30 - 17:45",
+  class: "slot-afternoon",
 };
 const evening1: Slot = {
   name: "Evening",
-    times: "20:30 - 22:00",
+  times: "20:30 - 22:00",
+  class: "slot-evening",
 };
 const evening2: Slot = {
   name: "Late Evening",
-    times: "22:30 - 23:30",
+  times: "22:30 - 23:30",
+  class: "slot-evening",
 };
 
 const slots: Slot[] = [slot1, slot2, slot3, evening1, evening2];
@@ -335,15 +341,15 @@ const TableForDay: React.FC<{ date: Date; slots: slot[]; activities: activity[];
 
 const ActivityCard: React.FC<{ activity: Activity }> = ({ activity }) => {
   return (
-    <div className="activityCard">
+    <div className={`activityCard activityCard-${activity.slotOnDay.slot.class}`}>
       <strong>{activity.title.split("(")[0]}</strong>
       <div className="activity-badges">
-        {activity.u12 && <span className="badge u12">U12</span>}
-        {activity.ml && <span className="badge ml">ML</span>}
-        {activity.s && <span className="badge s">S</span>}
-        {activity.lgbt && <span className="badge lgbt">🏳️‍🌈</span>}
-        {activity.prebook && <span className="badge prebook">Pre-book</span>}
-        {activity.minAge && <span className="badge min-age">{activity.minAge}+</span>}
+        {activity.u12 && <div className="badge u12"><span>U12</span></div>}
+        {activity.ml && <div className="badge ml"><span>ML</span></div>}
+        {activity.s && <div className="badge s"><span>S</span></div>}
+        {activity.lgbt && <div className="badge lgbt"><span>🏳️‍🌈</span></div>}
+        {activity.prebook && <div className="badge prebook"><span>Pre-book</span></div>}
+        {activity.minAge && <div className="badge min-age"><span>{activity.minAge}+</span></div>}
       </div>
     </div>
   );
@@ -359,7 +365,7 @@ const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ 
         <table className="programme-table">
           <thead>
             <tr>
-              <th>Slot</th>
+              <th></th>
               {dates.map((date) => (
                 <th key={date.toISOString()}>{format(date, "eeee do MMMM")}</th>
               ))}
@@ -390,14 +396,15 @@ const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ 
       {dates.map((date) => {
         const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
         return (
-          <div key={date.toISOString()}>
+          <div key={date.toISOString()} className="programme-date-section">
             <h3>{format(date, "eeee do MMMM")}</h3>
             {slots.map((slot) => {
               const activitiesForSlot = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
               if (activitiesForSlot.length === 0) return null;
               return (
-                <div key={`${date.toISOString()}-${slot.name}`}>
+                <div key={`${date.toISOString()}-${slot.name}`} className="programme-slot-section">
                   <h4>{slot.name}</h4>
+                  <p>{slot.times}</p>
                   {activitiesForSlot.map((activity, index) => {
                     return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} />;
                   })}
@@ -411,11 +418,12 @@ const TableForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ 
   );
 };
 
-const htmlString = renderToString(<TableForCenter activities={activities} center={centers[0]} />);
+for (const center of centers) {
+  const htmlString = renderToString(<TableForCenter activities={activities} center={center} />);
 
-console.log(htmlString);
+  console.log(htmlString);
 
-const htmlFile = `
+  const htmlFile = `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -431,6 +439,7 @@ ${htmlString}
 </body>
 </html>`;
 
-await fs.writeFile("programme.html", htmlFile, "utf8");
+  await fs.writeFile(`programme-${center.name}.html`, htmlFile, "utf8");
+}
 
 //console.log(JSON.stringify(activities, null, 2));
