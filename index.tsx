@@ -305,27 +305,27 @@ const ActivityCard: React.FC<{ activity: Activity; showCenter: boolean }> = ({ a
       {showCenter ? <p className="activityCard-center-p">{activity.center.name}</p> : null}
       <div className="activity-badges">
         {activity.u12 && (
-          <div className="badge u12">
+          <div className="badge u12" data-tooltip="Under 12s">
             <span>U12</span>
           </div>
         )}
         {activity.ml && (
-          <div className="badge ml">
+          <div className="badge ml" data-tooltip="Minimal Language">
             <span>ML</span>
           </div>
         )}
         {activity.s && (
-          <div className="badge s">
+          <div className="badge s" data-tooltip="Sustainability themed">
             <span>S</span>
           </div>
         )}
         {activity.lgbt && (
-          <div className="badge lgbt">
+          <div className="badge lgbt" data-tooltip="LGBT+ themed (open to all)">
             <span>🏳️‍🌈</span>
           </div>
         )}
         {activity.prebook && (
-          <div className="badge prebook">
+          <div className="badge prebook" data-tooltip="Pre-book">
             <span>Pre‑book</span>
           </div>
         )}

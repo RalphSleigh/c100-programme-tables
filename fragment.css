@@ -221,3 +221,12 @@ table.programme-table td p.times {
     display: none;
   }
 }
+
+[data-tooltip]:hover::after {
+  display: block;
+  position: absolute;
+  content: attr(data-tooltip);
+  border: 1px solid #ccc;
+  background: #eee;
+  padding: .25em;
+}
