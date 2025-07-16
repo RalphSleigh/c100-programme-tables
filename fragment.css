@@ -189,6 +189,27 @@ table.programme-table td p.times {
   color: #555;
 }
 
+.programme-activity-list-items {
+    margin: 0 2em 0em 2em;
+}
+
+.chip-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    margin-bottom: 1em;
+}
+
+.chip-key div {
+    display: flex;
+}
+
+.chip-key p {
+    margin: 0px;
+    margin-block-end: 0px;
+    margin-left: 0.5em;
+}
+
 @media (max-width: 40em) {
   .center-timetable-table {
     display: none;

@@ -227,7 +227,7 @@ const centers: Center[] = [
     name: "Centres centre",
     slug: "centres-centre",
     columns: [20],
-  }
+  },
 ];
 
 type Activity = {
@@ -245,16 +245,14 @@ type Activity = {
 const activities: Activity[] = [];
 
 async function getGoogleSheetData(sheetId: string, range: string): Promise<string[][]> {
+  const sheets = google.sheets({ version: "v4", auth: process.env.GOOGLE_SHEET_API_KEY });
 
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: sheetId,
+    range,
+  });
 
-    const sheets = google.sheets({ version: "v4", auth: process.env.GOOGLE_SHEET_API_KEY });
-
-    const response = await sheets.spreadsheets.values.get({
-        spreadsheetId: sheetId,
-        range,
-    });
-
-    return response.data.values as string[][];
+  return response.data.values as string[][];
 }
 
 // Example usage:
@@ -303,10 +301,8 @@ for (const activity of activities) {
 const ActivityCard: React.FC<{ activity: Activity; showCenter: boolean }> = ({ activity, showCenter }) => {
   return (
     <div className={`activityCard activityCard-${activity.slotOnDay.slot.class} activityCard-center-${activity.center.slug}`}>
-      <p className="activityCard-title">
-        {activity.title.split("(")[0]}
-        </p>
-        {showCenter ? <p className="activityCard-center-p">{activity.center.name}</p> : null}
+      <p className="activityCard-title">{activity.title.split("(")[0]}</p>
+      {showCenter ? <p className="activityCard-center-p">{activity.center.name}</p> : null}
       <div className="activity-badges">
         {activity.u12 && (
           <div className="badge u12">
@@ -343,6 +339,34 @@ const ActivityCard: React.FC<{ activity: Activity; showCenter: boolean }> = ({ a
   );
 };
 
+const ChipKey: React.FC = () => (
+  <div className="chip-key activityCard">
+    <div>
+      <div className="badge u12">
+        <span>U12</span>
+      </div>
+      <p>Under 12s</p>
+    </div>
+    <div>
+      <div className="badge ml">
+        <span>ML</span>
+      </div>
+      <p>Minimal language</p>
+    </div>
+    <div>
+      <div className="badge s">
+        <span>S</span>
+      </div>
+      <p>Sustainability themed</p>
+    </div>
+    <div>
+      <div className="badge lgbt">
+        <span>🏳️‍🌈</span>
+      </div>
+      <p>LGBT+ themed (open to all)</p>
+    </div>
+  </div>
+);
 const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ activities, center }) => {
   const activitiesForCenter = activities.filter((activity) => activity.center === center);
   return (
@@ -353,7 +377,9 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
             <tr>
               <th></th>
               {dates.map((date) => (
-                <th key={date.toISOString()}>{format(date, "eeee do MMMM")}</th>
+                <th key={date.toISOString()}>
+                  <a href={`../${format(date, "MM-dd")}`}>{format(date, "eeee do MMMM")}</a>
+                </th>
               ))}
             </tr>
           </thead>
@@ -379,6 +405,7 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
           </tbody>
         </table>
       </div>
+      <ChipKey />
       {dates.map((date) => {
         const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
         return (
@@ -391,9 +418,11 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
                 <div key={`${date.toISOString()}-${slot.name}`} className="programme-slot-section">
                   <h4>{slot.name}</h4>
                   <p>{slot.times}</p>
-                  {activitiesForSlot.map((activity, index) => {
-                    return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={false} />;
-                  })}
+                  <div className="programme-activity-list-items">
+                    {activitiesForSlot.map((activity, index) => {
+                      return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={false} />;
+                    })}
+                  </div>
                 </div>
               );
             })}
@@ -414,7 +443,9 @@ const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activiti
             <tr>
               <th></th>
               {centers.map((center) => (
-                <th key={center.slug}>{center.name}</th>
+                <th key={center.slug}>
+                  <a href={`../${center.slug}`}>{center.name}</a>
+                </th>
               ))}
             </tr>
           </thead>
@@ -440,15 +471,18 @@ const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activiti
           </tbody>
         </table>
       </div>
+      <ChipKey />
       {slots.map((slot) => {
         const activitiesForSlot = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
         return (
           <div key={slot.name} className={`programme-slot-section programme-slot-${slot.class} programme-table-day`}>
             <h4>{slot.name}</h4>
             <p>{slot.times}</p>
-            {activitiesForSlot.map((activity, index) => {
-              return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={true} />;
-            })}
+            <div className="programme-activity-list-items">
+              {activitiesForSlot.map((activity, index) => {
+                return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={true} />;
+              })}
+            </div>
           </div>
         );
       })}
@@ -493,15 +527,15 @@ const wordpressGetID = async (slug: string) => {
     headers: {
       Authorization: `Basic ${Buffer.from(`${process.env.WORDPRESS_USERNAME}:${process.env.WORDPRESS_PASSWORD}`).toString("base64")}`,
     },
-    });
-    const responseJson = await pages.json();
-    if (pages.ok && responseJson.length > 0) {
-        return responseJson[0].id;
-        }
-    throw new Error(`Page with slug ${slug} not found`);
-}
+  });
+  const responseJson = await pages.json();
+  if (pages.ok && responseJson.length > 0) {
+    return responseJson[0].id;
+  }
+  throw new Error(`Page with slug ${slug} not found`);
+};
 
-const parentPageId = await wordpressGetID("programme")
+const parentPageId = await wordpressGetID("programme");
 
 for (const center of centers) {
   const htmlString = renderToString(<PageForCenter activities={activities} center={center} />);
