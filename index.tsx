@@ -501,7 +501,7 @@ const wordpressGetID = async (slug: string) => {
     throw new Error(`Page with slug ${slug} not found`);
 }
 
-const parentPageId = await wordpressGetID("programme-activities")
+const parentPageId = await wordpressGetID("programme")
 
 for (const center of centers) {
   const htmlString = renderToString(<PageForCenter activities={activities} center={center} />);
