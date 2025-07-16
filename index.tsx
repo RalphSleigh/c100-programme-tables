@@ -384,8 +384,10 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
             </tr>
           </thead>
           <tbody>
-            {slots.map((slot) => (
-              <tr key={slot.name}>
+            {slots.map((slot) => {
+              const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.slot === slot);
+              if(activitiesForSlot.length === 0) return null;
+              return <tr key={slot.name}>
                 <td>
                   <p>{slot.name}</p>
                   <p className="times">{slot.times}</p>
@@ -401,7 +403,8 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
                   );
                 })}
               </tr>
-            ))}
+            }
+            )}
           </tbody>
         </table>
       </div>
@@ -450,8 +453,11 @@ const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activiti
             </tr>
           </thead>
           <tbody>
-            {slots.map((slot) => (
-              <tr key={slot.name}>
+            {slots.map((slot) => {
+              const activitiesForRow = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
+            if (activitiesForRow.length === 0) return null;
+              
+              return <tr key={slot.name}>
                 <td>
                   <p>{slot.name}</p>
                   <p className="times">{slot.times}</p>
@@ -467,7 +473,8 @@ const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activiti
                   );
                 })}
               </tr>
-            ))}
+            }
+            )}
           </tbody>
         </table>
       </div>
