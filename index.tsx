@@ -436,6 +436,76 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
   );
 };
 
+const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity) => boolean }> = ({ activities, filter }) => {
+  const activitiesForCenter = activities.filter(filter);
+  return (
+    <>
+      <div className="center-timetable-table">
+        <table className="programme-table programme-table-day">
+          <thead>
+            <tr>
+              <th></th>
+              {dates.map((date) => (
+                <th key={date.toISOString()}>
+                  <a href={`../${format(date, "MM-dd")}`}>{format(date, "eeee do MMMM")}</a>
+                </th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {slots.map((slot) => {
+              const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.slot === slot);
+              if(activitiesForSlot.length === 0) return null;
+              return <tr key={slot.name}>
+                <td>
+                  <p>{slot.name}</p>
+                  <p className="times">{slot.times}</p>
+                </td>
+                {dates.map((date) => {
+                  const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date && activity.slotOnDay.slot === slot);
+                  return (
+                    <td key={`${date.toISOString()}-${slot.name}`}>
+                      {activitiesForSlot.map((activity, index) => (
+                        <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={true} />
+                      ))}
+                    </td>
+                  );
+                })}
+              </tr>
+            }
+            )}
+          </tbody>
+        </table>
+      </div>
+      <ChipKey />
+      {dates.map((date) => {
+        const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
+        return (
+          <div key={date.toISOString()} className="programme-date-section programme-table-center">
+            <h3>{format(date, "eeee do MMMM")}</h3>
+            {slots.map((slot) => {
+              const activitiesForSlot = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
+              if (activitiesForSlot.length === 0) return null;
+              return (
+                <div key={`${date.toISOString()}-${slot.name}`} className="programme-slot-section">
+                  <h4>{slot.name}</h4>
+                  <p>{slot.times}</p>
+                  <div className="programme-activity-list-items">
+                    {activitiesForSlot.map((activity, index) => {
+                      return <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={false} />;
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })}
+    </>
+  );
+};
+
+
 const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activities, date }) => {
   const activitiesForDate = activities.filter((activity) => activity.slotOnDay.date === date);
   return (
@@ -605,5 +675,53 @@ ${htmlString}
     status: "publish",
   });
 }
+
+const htmlLGBT = renderToString(
+  <PageForTag activities={activities} filter={(activity) => activity.lgbt} />
+);
+await fs.writeFile("programme-lgbt.html", htmlLGBT, "utf8");
+await wordpressPageUpsert({
+  slug: "lgbt",
+  title: "Activities - LGBT+ themed",
+  content: htmlLGBT,
+  parent: parentPageId,
+  status: "publish",
+});
+
+const htmlUnder12 = renderToString(
+  <PageForTag activities={activities} filter={(activity) => activity.u12} />
+);
+await fs.writeFile("programme-under12.html", htmlUnder12, "utf8");
+await wordpressPageUpsert({
+  slug: "under-12",
+  title: "Activities - Under 12s",
+  content: htmlUnder12,
+  parent: parentPageId,
+  status: "publish",
+});
+
+const htmlSustainability = renderToString(
+  <PageForTag activities={activities} filter={(activity) => activity.s} />  
+);
+await fs.writeFile("programme-sustainability.html", htmlSustainability, "utf8");
+await wordpressPageUpsert({
+    slug: "sustainability",
+    title: "Activities - Sustainability themed",
+    content: htmlSustainability,
+    parent: parentPageId,
+    status: "publish",
+    });
+
+const htmlMinimalLanguage = renderToString(
+  <PageForTag activities={activities} filter={(activity) => activity.ml} /> 
+);
+await fs.writeFile("programme-minimal-language.html", htmlMinimalLanguage, "utf8");
+await wordpressPageUpsert({
+  slug: "minimal-language",
+  title: "Activities - Minimal language",
+  content: htmlMinimalLanguage,
+  parent: parentPageId,
+  status: "publish",
+});
 
 //console.log(JSON.stringify(activities, null, 2));
