@@ -394,25 +394,25 @@ const ChipKey: React.FC = () => (
       <div className="badge u12">
         <span>U12</span>
       </div>
-      <p>Under 12s</p>
+      <p><a href="../under-12">Under 12s</a></p>
     </div>
     <div>
       <div className="badge ml">
         <span>ML</span>
       </div>
-      <p>Minimal language</p>
+      <p><a href="../minimal-language">Minimal language</a></p>
     </div>
     <div>
       <div className="badge s">
         <span>S</span>
       </div>
-      <p>Sustainability themed</p>
+      <p><a href="../sustainability">Sustainability themed</a></p>
     </div>
     <div>
       <div className="badge lgbt">
         <span>🏳️‍🌈</span>
       </div>
-      <p>LGBT+ themed (open to all)</p>
+      <p><a href="../lgbt">LGBT+ themed (open to all)</a></p>
     </div>
   </div>
 );
@@ -524,8 +524,9 @@ const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity
                     <p className="times">{slot.times}</p>
                   </td>
                   {dates.map((date) => {
-                    const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date && activity.slotOnDay.slot === slot);
-                    if (activitiesForSlot.length === 0) return null;
+                    const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
+                    if (activitiesForDate.length === 0) return null;
+                    const activitiesForSlot = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
                     return (
                       <td key={`${date.toISOString()}-${slot.name}`}>
                         {activitiesForSlot.map((activity, index) => (
