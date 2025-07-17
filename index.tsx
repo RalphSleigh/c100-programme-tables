@@ -502,11 +502,15 @@ const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity
           <thead>
             <tr>
               <th></th>
-              {dates.map((date) => (
-                <th key={date.toISOString()}>
-                  <a href={`../${format(date, "MM-dd")}`}>{format(date, "eeee do MMMM")}</a>
-                </th>
-              ))}
+              {dates.map((date) => {
+                const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
+                if (activitiesForDate.length === 0) return null;
+                return (
+                  <th key={date.toISOString()}>
+                    <a href={`../${format(date, "MM-dd")}`}>{format(date, "eeee do MMMM")}</a>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
@@ -521,6 +525,7 @@ const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity
                   </td>
                   {dates.map((date) => {
                     const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date && activity.slotOnDay.slot === slot);
+                    if (activitiesForSlot.length === 0) return null;
                     return (
                       <td key={`${date.toISOString()}-${slot.name}`}>
                         {activitiesForSlot.map((activity, index) => (
