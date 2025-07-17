@@ -215,6 +215,11 @@ table.programme-table td p.times {
   margin-left: 0.5em;
 }
 
+.center-image {
+    margin:0 auto;
+    max-width: 50em;
+}
+
 @media (max-width: 40em) {
   .center-timetable-table {
     display: none;
