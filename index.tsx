@@ -39,13 +39,17 @@ const evening2: Slot = {
 
 const slots: Slot[] = [slot1, slot2, slot3, evening1, evening2];
 
+const date27th = new Date("2025-07-27T00:00:00Z");
 const date28th = new Date("2025-07-28T00:00:00Z");
 const date29th = new Date("2025-07-29T00:00:00Z");
+const date30th = new Date("2025-07-30T00:00:00Z");
 const date31st = new Date("2025-07-31T00:00:00Z");
+const date1st = new Date("2025-08-01T00:00:00Z");
 const date2nd = new Date("2025-08-02T00:00:00Z");
+const date3rd = new Date("2025-08-03T00:00:00Z");
 const date4th = new Date("2025-08-04T00:00:00Z");
 
-const dates: Date[] = [date28th, date29th, date31st, date2nd, date4th];
+const dates: Date[] = [date27th, date28th, date29th, date30th, date31st, date1st, date2nd, date3rd, date4th];
 
 type SlotOnDay = {
   date: Date;
@@ -55,109 +59,149 @@ type SlotOnDay = {
 
 const slotsOnDays: SlotOnDay[] = [
   {
-    date: date28th,
-    slot: slot1,
+    date: date27th,
+    slot: evening1,
     row: 4,
   },
   {
     date: date28th,
+    slot: slot1,
+    row: 6,
+  },
+  {
+    date: date28th,
     slot: slot2,
-    row: 5,
+    row: 7,
   },
   {
     date: date28th,
     slot: slot3,
-    row: 6,
-  },
-  {
-    date: date29th,
-    slot: slot1,
     row: 8,
   },
   {
     date: date29th,
-    slot: slot2,
-    row: 9,
-  },
-  {
-    date: date29th,
-    slot: slot3,
+    slot: slot1,
     row: 10,
   },
   {
     date: date29th,
-    slot: evening1,
+    slot: slot2,
     row: 11,
   },
   {
     date: date29th,
-    slot: evening2,
+    slot: slot3,
     row: 12,
   },
   {
-    date: date31st,
-    slot: slot1,
+    date: date29th,
+    slot: evening1,
+    row: 13,
+  },
+  {
+    date: date29th,
+    slot: evening2,
     row: 14,
   },
   {
-    date: date31st,
+    date: date30th,
     slot: slot2,
-    row: 15,
-  },
-  {
-    date: date31st,
-    slot: slot3,
     row: 16,
   },
   {
-    date: date31st,
+    date: date30th,
     slot: evening1,
     row: 17,
   },
   {
     date: date31st,
+    slot: slot1,
+    row: 19,
+  },
+  {
+    date: date31st,
+    slot: slot2,
+    row: 20,
+  },
+  {
+    date: date31st,
+    slot: slot3,
+    row: 21,
+  },
+  {
+    date: date31st,
+    slot: evening1,
+    row: 22,
+  },
+  {
+    date: date31st,
     slot: evening2,
-    row: 18,
+    row: 23,
+  },
+  {
+    date: date1st,
+    slot: slot1,
+    row: 25,
+  },
+  {
+    date: date1st,
+    slot: slot2,
+    row: 26,
+  },
+  {
+    date: date1st,
+    slot: evening1,
+    row: 27,
   },
   {
     date: date2nd,
     slot: slot1,
-    row: 20,
+    row: 29,
   },
   {
     date: date2nd,
     slot: slot2,
-    row: 21,
+    row: 30,
   },
   {
     date: date2nd,
     slot: slot3,
-    row: 22,
+    row: 31,
   },
   {
     date: date2nd,
     slot: evening1,
-    row: 23,
+    row: 32,
   },
   {
     date: date2nd,
     slot: evening2,
-    row: 24,
+    row: 33,
+  },
+  {
+    date: date3rd,
+    slot: slot1,
+    row: 35,
+  },
+  {
+    date: date3rd,
+    slot: evening1,
+    row: 36,
   },
   {
     date: date4th,
     slot: slot1,
-    row: 26,
+    row: 38,
   },
   {
     date: date4th,
     slot: slot2,
-    row: 27,
+    row: 39,
   },
   {
     date: date4th,
     slot: slot3,
-    row: 28,
+    row: 40,
   },
 ];
 
@@ -227,6 +271,11 @@ const centers: Center[] = [
     name: "Centres centre",
     slug: "centres-centre",
     columns: [20],
+  },
+  {
+    name: "Cinema 100",
+    slug: "cinema-100",
+    columns: [21],
   },
 ];
 
@@ -376,41 +425,49 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
           <thead>
             <tr>
               <th></th>
-              {dates.map((date) => (
-                <th key={date.toISOString()}>
-                  <a href={`../${format(date, "MM-dd")}`}>{format(date, "eeee do MMMM")}</a>
-                </th>
-              ))}
+              {dates.map((date) => {
+                const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
+                if (activitiesForDate.length === 0) return null;
+                return (
+                  <th key={date.toISOString()}>
+                    <a href={`../${format(date, "MM-dd")}`}>{format(date, "eeee do MMMM")}</a>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
             {slots.map((slot) => {
               const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.slot === slot);
-              if(activitiesForSlot.length === 0) return null;
-              return <tr key={slot.name}>
-                <td>
-                  <p>{slot.name}</p>
-                  <p className="times">{slot.times}</p>
-                </td>
-                {dates.map((date) => {
-                  const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date && activity.slotOnDay.slot === slot);
-                  return (
-                    <td key={`${date.toISOString()}-${slot.name}`}>
-                      {activitiesForSlot.map((activity, index) => (
-                        <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={false} />
-                      ))}
-                    </td>
-                  );
-                })}
-              </tr>
-            }
-            )}
+              if (activitiesForSlot.length === 0) return null;
+              return (
+                <tr key={slot.name}>
+                  <td>
+                    <p>{slot.name}</p>
+                    <p className="times">{slot.times}</p>
+                  </td>
+                  {dates.map((date) => {
+                    const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
+                    if (activitiesForDate.length === 0) return null;
+                    const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date && activity.slotOnDay.slot === slot);
+                    return (
+                      <td key={`${date.toISOString()}-${slot.name}`}>
+                        {activitiesForSlot.map((activity, index) => (
+                          <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={false} />
+                        ))}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
       <ChipKey />
       {dates.map((date) => {
         const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
+        if (activitiesForDate.length === 0) return null;
         return (
           <div key={date.toISOString()} className="programme-date-section programme-table-center">
             <h3>{format(date, "eeee do MMMM")}</h3>
@@ -455,25 +512,26 @@ const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity
           <tbody>
             {slots.map((slot) => {
               const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.slot === slot);
-              if(activitiesForSlot.length === 0) return null;
-              return <tr key={slot.name}>
-                <td>
-                  <p>{slot.name}</p>
-                  <p className="times">{slot.times}</p>
-                </td>
-                {dates.map((date) => {
-                  const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date && activity.slotOnDay.slot === slot);
-                  return (
-                    <td key={`${date.toISOString()}-${slot.name}`}>
-                      {activitiesForSlot.map((activity, index) => (
-                        <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={true} />
-                      ))}
-                    </td>
-                  );
-                })}
-              </tr>
-            }
-            )}
+              if (activitiesForSlot.length === 0) return null;
+              return (
+                <tr key={slot.name}>
+                  <td>
+                    <p>{slot.name}</p>
+                    <p className="times">{slot.times}</p>
+                  </td>
+                  {dates.map((date) => {
+                    const activitiesForSlot = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date && activity.slotOnDay.slot === slot);
+                    return (
+                      <td key={`${date.toISOString()}-${slot.name}`}>
+                        {activitiesForSlot.map((activity, index) => (
+                          <ActivityCard key={`${date.toISOString()}-${slot.name}-${index}`} activity={activity} showCenter={true} />
+                        ))}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -505,7 +563,6 @@ const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity
   );
 };
 
-
 const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activities, date }) => {
   const activitiesForDate = activities.filter((activity) => activity.slotOnDay.date === date);
   return (
@@ -525,26 +582,27 @@ const PageForDay: React.FC<{ activities: Activity[]; date: Date }> = ({ activiti
           <tbody>
             {slots.map((slot) => {
               const activitiesForRow = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
-            if (activitiesForRow.length === 0) return null;
-              
-              return <tr key={slot.name}>
-                <td>
-                  <p>{slot.name}</p>
-                  <p className="times">{slot.times}</p>
-                </td>
-                {centers.map((center) => {
-                  const activitiesForCenter = activitiesForDate.filter((activity) => activity.center === center && activity.slotOnDay.slot === slot);
-                  return (
-                    <td key={`${date.toISOString()}-${center.slug}-${slot.name}`}>
-                      {activitiesForCenter.map((activity, index) => (
-                        <ActivityCard key={`${date.toISOString()}-${center.slug}-${slot.name}-${index}`} activity={activity} showCenter={true} />
-                      ))}
-                    </td>
-                  );
-                })}
-              </tr>
-            }
-            )}
+              if (activitiesForRow.length === 0) return null;
+
+              return (
+                <tr key={slot.name}>
+                  <td>
+                    <p>{slot.name}</p>
+                    <p className="times">{slot.times}</p>
+                  </td>
+                  {centers.map((center) => {
+                    const activitiesForCenter = activitiesForDate.filter((activity) => activity.center === center && activity.slotOnDay.slot === slot);
+                    return (
+                      <td key={`${date.toISOString()}-${center.slug}-${slot.name}`}>
+                        {activitiesForCenter.map((activity, index) => (
+                          <ActivityCard key={`${date.toISOString()}-${center.slug}-${slot.name}-${index}`} activity={activity} showCenter={true} />
+                        ))}
+                      </td>
+                    );
+                  })}
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
@@ -676,9 +734,7 @@ ${htmlString}
   });
 }
 
-const htmlLGBT = renderToString(
-  <PageForTag activities={activities} filter={(activity) => activity.lgbt} />
-);
+const htmlLGBT = renderToString(<PageForTag activities={activities} filter={(activity) => activity.lgbt} />);
 await fs.writeFile("programme-lgbt.html", htmlLGBT, "utf8");
 await wordpressPageUpsert({
   slug: "lgbt",
@@ -688,9 +744,7 @@ await wordpressPageUpsert({
   status: "publish",
 });
 
-const htmlUnder12 = renderToString(
-  <PageForTag activities={activities} filter={(activity) => activity.u12} />
-);
+const htmlUnder12 = renderToString(<PageForTag activities={activities} filter={(activity) => activity.u12} />);
 await fs.writeFile("programme-under12.html", htmlUnder12, "utf8");
 await wordpressPageUpsert({
   slug: "under-12",
@@ -700,21 +754,17 @@ await wordpressPageUpsert({
   status: "publish",
 });
 
-const htmlSustainability = renderToString(
-  <PageForTag activities={activities} filter={(activity) => activity.s} />  
-);
+const htmlSustainability = renderToString(<PageForTag activities={activities} filter={(activity) => activity.s} />);
 await fs.writeFile("programme-sustainability.html", htmlSustainability, "utf8");
 await wordpressPageUpsert({
-    slug: "sustainability",
-    title: "Activities - Sustainability themed",
-    content: htmlSustainability,
-    parent: parentPageId,
-    status: "publish",
-    });
+  slug: "sustainability",
+  title: "Activities - Sustainability themed",
+  content: htmlSustainability,
+  parent: parentPageId,
+  status: "publish",
+});
 
-const htmlMinimalLanguage = renderToString(
-  <PageForTag activities={activities} filter={(activity) => activity.ml} /> 
-);
+const htmlMinimalLanguage = renderToString(<PageForTag activities={activities} filter={(activity) => activity.ml} />);
 await fs.writeFile("programme-minimal-language.html", htmlMinimalLanguage, "utf8");
 await wordpressPageUpsert({
   slug: "minimal-language",
