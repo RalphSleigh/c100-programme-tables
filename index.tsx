@@ -543,6 +543,7 @@ const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity
       <ChipKey />
       {dates.map((date) => {
         const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
+        if (activitiesForDate.length === 0) return null;
         return (
           <div key={date.toISOString()} className="programme-date-section programme-table-center">
             <h3>{format(date, "eeee do MMMM")}</h3>
