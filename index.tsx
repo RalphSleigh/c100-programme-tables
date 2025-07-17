@@ -546,7 +546,7 @@ const PageForTag: React.FC<{ activities: Activity[]; filter: (activity: Activity
         const activitiesForDate = activitiesForCenter.filter((activity) => activity.slotOnDay.date === date);
         if (activitiesForDate.length === 0) return null;
         return (
-          <div key={date.toISOString()} className="programme-date-section programme-table-center">
+          <div key={date.toISOString()} className="programme-date-section programme-table-day">
             <h3>{format(date, "eeee do MMMM")}</h3>
             {slots.map((slot) => {
               const activitiesForSlot = activitiesForDate.filter((activity) => activity.slotOnDay.slot === slot);
