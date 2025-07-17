@@ -209,6 +209,7 @@ type Center = {
   name: string;
   slug: string;
   columns: number[];
+  image?: string; // Optional image URL for the center
 };
 
 const centers: Center[] = [
@@ -276,6 +277,7 @@ const centers: Center[] = [
     name: "Cinema 100",
     slug: "cinema-100",
     columns: [21],
+    image: "https://camp100.org.uk/wp-content/uploads/2025/07/Cinema-100-Final-Schedule-1-scaled.jpg"
   },
 ];
 
@@ -420,6 +422,11 @@ const PageForCenter: React.FC<{ activities: Activity[]; center: Center }> = ({ a
   const activitiesForCenter = activities.filter((activity) => activity.center === center);
   return (
     <>
+       { center.image && (
+        <div className="center-image">
+            <img src={center.image} alt={`Activities at ${center.name}`} />
+        </div>
+      )}
       <div className="center-timetable-table">
         <table className="programme-table programme-table-center">
           <thead>
