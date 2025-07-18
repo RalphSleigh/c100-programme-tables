@@ -295,6 +295,11 @@ const centers: Center[] = [
     columns: [21],
     image: "https://camp100.org.uk/wp-content/uploads/2025/07/Cinema-100-Final-Schedule-1-scaled.jpg"
   },
+  {
+    name: "Main Stage",
+    slug: "main-stage",
+    columns: [22],
+  }
 ];
 
 type Activity = {
