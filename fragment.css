@@ -152,6 +152,10 @@ table.programme-table td p.times {
   border-left: 3px solid #dbcc44;
 }
 
+.programme-table-day .activityCard-center-main-stage {
+  border-left: 3px solid #00ff00;
+}
+
 .activityCard .badge.u12 {
   background-color: #28a745;
 }
@@ -216,8 +220,10 @@ table.programme-table td p.times {
 }
 
 .center-image {
-    margin:0 auto;
+    margin:1em auto;
     max-width: 50em;
+    padding: 0.5em;
+    border: 1px solid #ddd;
 }
 
 @media (max-width: 40em) {

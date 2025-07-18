@@ -48,8 +48,9 @@ const date1st = new Date("2025-08-01T00:00:00Z");
 const date2nd = new Date("2025-08-02T00:00:00Z");
 const date3rd = new Date("2025-08-03T00:00:00Z");
 const date4th = new Date("2025-08-04T00:00:00Z");
+const date5th = new Date("2025-08-05T00:00:00Z");
 
-const dates: Date[] = [date27th, date28th, date29th, date30th, date31st, date1st, date2nd, date3rd, date4th];
+const dates: Date[] = [date27th, date28th, date29th, date30th, date31st, date1st, date2nd, date3rd, date4th, date5th];
 
 type SlotOnDay = {
   date: Date;
@@ -202,6 +203,21 @@ const slotsOnDays: SlotOnDay[] = [
     date: date4th,
     slot: slot3,
     row: 40,
+  },
+  {
+    date: date4th,
+    slot: evening1,
+    row: 41,
+  },
+  {
+    date: date4th,
+    slot: evening2,
+    row: 42,
+  },
+  {
+    date: date5th,
+    slot: evening1,
+    row: 44,
   },
 ];
 
